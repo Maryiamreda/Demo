@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose')
 const skills = require('./models/Skills')
+const Students = require('./models/students')
+
 const app = express();
 app.use(express.json());
 const dburl = 'mongodb+srv://netninja:192837@cluster0.r9zdppo.mongodb.net/students-info';
@@ -18,6 +20,8 @@ app.post('/CreateSkill', (req, res) => {
     const skill = new skills(req.body)
     skill.save().then((result) => {
         res.json(skill)
+        Students.updateMany({ '_id': skill.Students }, { $push: { Skills: skill._id } })
+
         // res.redirect('/')
     }).catch(err => {
         console.log(err);

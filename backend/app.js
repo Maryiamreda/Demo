@@ -61,13 +61,15 @@ app.post('/CreateStudent', (req, res) => {
 
     const student = new Students(req.body)
     student.save().then((result) => {
+        Address.updateMany({ '_id': student.Adress }, { $push: { Students: student._id } })
         res.json(student)
+
+
         // res.redirect('/')
     }).catch(err => {
         console.log(err);
     });
-    skills.updateMany({ '_id': student.Skills }, { $push: { Students: student._id } })
-    Address.updateMany({ '_id': student.Adress }, { $push: { Students: student._id } })
+
 
 })
 
