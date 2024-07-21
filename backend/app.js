@@ -4,6 +4,8 @@ const Students = require('./models/students')
 const skills = require('./models/Skills')
 const Address = require('./models/Addresses')
 
+
+
 // express app
 const app = express();
 app.use(express.json());
@@ -16,13 +18,17 @@ mongoose.connect(dburl, { useNewUrlParser: true, useUnifiedTopology: true })
 app.set('view engine', 'ejs');
 
 
+const cors = require("cors");
+
+app.use(cors());
+
 
 
 app.get('/', (req, res) => {
     res.send('it is working')
 })
 //GetAllStudents
-app.get('/GetAllStudents', (req, res) => {
+app.get('/students', (req, res) => {
     Students.find()
         .then(result => {
             res.send(result);
@@ -33,7 +39,7 @@ app.get('/GetAllStudents', (req, res) => {
 });
 
 //GetStudentById
-app.get('/GetStudentById/:id', (req, res) => {
+app.get('/students/:id', (req, res) => {
     const id = req.params.id;
     Students.findById(id)
         .then(result => {
@@ -45,7 +51,7 @@ app.get('/GetStudentById/:id', (req, res) => {
 })
 
 //GetStudentByName
-app.get('/GetStudent/:FirstName', (req, res) => {
+app.get('/students/:FirstName', (req, res) => {
     const firstname = req.params.FirstName;
     Students.find({ FirstName: firstname })
         .then(result => {
@@ -57,7 +63,7 @@ app.get('/GetStudent/:FirstName', (req, res) => {
 })
 
 //CreateStudent
-app.post('/CreateStudent', (req, res) => {
+app.post('/students/Create', (req, res) => {
 
     const student = new Students(req.body)
     student.save().then((result) => {
@@ -74,7 +80,7 @@ app.post('/CreateStudent', (req, res) => {
 })
 
 //EditStudent
-app.put('/EditStudent/:id', async (req, res) => {
+app.put('/students/Edit/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const student = await Students.findByIdAndUpdate(id, req.body)
@@ -89,7 +95,7 @@ app.put('/EditStudent/:id', async (req, res) => {
     };
 })
 //DeleteStudent
-app.delete('/DeleteStudent/:id', async (req, res) => {
+app.delete('/students/Delete/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const student = await Students.findByIdAndDelete(id, req.body)
@@ -108,7 +114,7 @@ app.delete('/DeleteStudent/:id', async (req, res) => {
 //CreateSkill
 
 //GetStudentsBySkillName
-app.get('/GetStudentsBySkillName/:Skill', (req, res) => {
+app.get('/students/:Skill', (req, res) => {
     const skill = req.params.Skill;
     Students.find({ Skills: skill })
         .then(result => {
