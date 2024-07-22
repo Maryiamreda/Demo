@@ -77,6 +77,7 @@ class _dataTableState extends State<dataTable> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Student'),
+        backgroundColor: Colors.purple[200],
       ),
       body: Column(
         children: [
