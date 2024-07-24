@@ -12,8 +12,22 @@ const studentSchema = new Schema({
     Adress: [
         {
 
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "address"
+            Country: {
+                type: String,
+                required: true
+            },
+            City: {
+                type: String,
+                required: true
+            },
+            Street1: {
+                type: String,
+                required: true
+            },
+            Street2: {
+                type: String,
+                required: true
+            }
 
         }
 
@@ -25,7 +39,6 @@ const studentSchema = new Schema({
             ref: "skills"
         }
     ]
-    // Skills: [{ type: String, required: true }]
 
 
 }, { timestamps: true });

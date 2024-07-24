@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose')
 const Students = require('./models/students')
 const skills = require('./models/Skills')
-const Address = require('./models/Addresses')
+// const Address = require('./models/Addresses')
 
 
 
@@ -63,21 +63,24 @@ app.get('/students/:FirstName', (req, res) => {
 })
 
 //CreateStudent
-app.post('/students/Create', (req, res) => {
 
-    const student = new Students(req.body)
-    student.save().then((result) => {
-        Address.updateMany({ '_id': student.Adress }, { $push: { Students: student._id } })
-        res.json(student)
+app.post('/students/Create', async (req, res) => {
+    const student = new Students(req.body);
 
+    try {
+        const savedStudent = await student.save();
 
-        // res.redirect('/')
-    }).catch(err => {
+        await skills.updateMany(
+            { '_id': { $in: savedStudent.Skills } },
+            { $push: { Students: savedStudent._id } }
+        );
+
+        res.json(savedStudent);
+    } catch (err) {
         console.log(err);
-    });
-
-
-})
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 //EditStudent
 app.put('/students/Edit/:id', async (req, res) => {
