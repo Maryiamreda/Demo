@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/add_student.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -102,9 +103,18 @@ class _dataTableState extends State<dataTable> {
                   onsortColum(columnIndex, ascending);
                 },
               ),
+              DataColumn(label: Text(' ')),
             ],
             source: data,
           ),
+          FilledButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => addStudent()),
+                );
+              },
+              child: const Text(' + Add New Student'))
         ],
       ),
     );
@@ -126,6 +136,12 @@ class Data extends DataTableSource {
     return DataRow(cells: [
       DataCell(Text(_student[index].FirstName)),
       DataCell(Text(_student[index].LastName)),
+      DataCell(
+        TextButton(
+          onPressed: () {},
+          child: Icon(Icons.edit),
+        ),
+      )
     ]);
   }
 
