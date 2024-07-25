@@ -2,6 +2,20 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+class Student {
+  final String FirstName;
+  final String LastName;
+  // final String Address[];
+  Student({required this.FirstName, required this.LastName});
+
+  factory Student.fromJson(Map<String, dynamic> json) {
+    return Student(
+      FirstName: json['FirstName'],
+      LastName: json['LastName'],
+    );
+  }
+}
+
 class addStudent extends StatefulWidget {
   @override
   _addStudentState createState() => _addStudentState();
