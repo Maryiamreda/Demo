@@ -64,6 +64,7 @@ app.get('/students/:FirstName', (req, res) => {
 
 //CreateStudent
 app.post('/students/Create', async (req, res) => {
+    console.log('Received body:', req.body);
     const { FirstName, LastName, Skills, Address: addressData } = req.body;
 
     try {
@@ -93,7 +94,7 @@ app.post('/students/Create', async (req, res) => {
         }
 
         // Update the addresses collection
-        if (savedStudent.Address.length > 0) {
+        if (savedStudent.Adress.length > 0) {
             await Address.updateMany(
                 { '_id': { $in: savedStudent.Address } },
                 { $push: { Students: savedStudent._id } }

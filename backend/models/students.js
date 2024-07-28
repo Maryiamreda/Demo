@@ -12,23 +12,8 @@ const studentSchema = new Schema({
     Adress: [
         {
 
-            Country: {
-                type: String,
-                required: true
-            },
-            City: {
-                type: String,
-                required: true
-            },
-            Street1: {
-                type: String,
-                required: true
-            },
-            Street2: {
-                type: String,
-                required: true
-            }
-
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "address"
         }
 
     ]
