@@ -74,12 +74,11 @@ app.post('/students/Create', async (req, res) => {
             const savedAddress = await newAddress.save();
             return savedAddress._id;
         }) || []);
-
         // Create and save the student
         const student = new Students({
             FirstName,
             LastName,
-            Address: addressIds,
+            Adress: addressIds,
             Skills: Skills || [],
         });
 
@@ -103,6 +102,7 @@ app.post('/students/Create', async (req, res) => {
 
         res.json(savedStudent);
         console.log(req.body);
+        console.log('Received Skills:', Skills);
 
     } catch (err) {
         console.error(err);
