@@ -41,7 +41,8 @@ app.get('/students', (req, res) => {
 //GetStudentById
 app.get('/students/:id', (req, res) => {
     const id = req.params.id;
-    Students.findById(id)
+    Students.findById(id).populate('Adress')
+        .populate('Skills')
         .then(result => {
             res.send(result);
         })

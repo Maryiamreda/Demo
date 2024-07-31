@@ -4,49 +4,16 @@ import 'package:frontend/edit-student.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class address {
-  String Country;
-  String City;
-  String Street1;
-  String Street2;
-
-  address(
-      {required this.Country,
-      required this.City,
-      required this.Street1,
-      required this.Street2});
-
-  factory address.fromJson(Map<String, dynamic> json) {
-    return address(
-      Country: json['Country'],
-      City: json['City'],
-      Street1: json['Street1'],
-      Street2: json['Street2'],
-    );
-  }
-  @override
-  String toString() {
-    return '{ ${this.Country}, ${this.City}, ${this.Street1}, ${this.Street2} }';
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'Country': Country,
-      'City': City,
-      'Street1': Street1,
-      'Street2': Street2,
-    };
-  }
-}
-
-class Student {
+class Students {
+  final String id;
   final String FirstName;
   final String LastName;
 
-  Student({required this.FirstName, required this.LastName});
+  Students({required this.id, required this.FirstName, required this.LastName});
 
-  factory Student.fromJson(Map<String, dynamic> json) {
-    return Student(
+  factory Students.fromJson(Map<String, dynamic> json) {
+    return Students(
+      id: json['_id'],
       FirstName: json['FirstName'],
       LastName: json['LastName'],
     );
@@ -62,14 +29,14 @@ class dataTable extends StatefulWidget {
 
 class _dataTableState extends State<dataTable> {
   late Data data;
-  List<Student> _students = [];
+  List<Students> _students = [];
   int _sortColumnIndex = 0;
   bool _sortAscending = true;
 
   @override
   void initState() {
     super.initState();
-    data = Data(_students, context, _showEditDialog);
+    data = Data(_students, context);
     getAll();
   }
 
@@ -79,7 +46,7 @@ class _dataTableState extends State<dataTable> {
     if (response.statusCode == 200) {
       final List<dynamic> json = jsonDecode(response.body);
       setState(() {
-        _students = json.map((item) => Student.fromJson(item)).toList();
+        _students = json.map((item) => Students.fromJson(item)).toList();
         data.updateData(_students);
       });
     } else {
@@ -107,26 +74,6 @@ class _dataTableState extends State<dataTable> {
       _sortAscending = ascending;
       data.updateData(_students);
     });
-  }
-
-  void _showEditDialog(BuildContext context, Student student) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Edit'),
-          content: Text('Edit ${student.FirstName} ${student.LastName}'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
@@ -178,13 +125,11 @@ class _dataTableState extends State<dataTable> {
 }
 
 class Data extends DataTableSource {
-  List<Student> _student;
+  List<Students> _student;
   BuildContext context;
-  Function(BuildContext, Student) onEdit;
+  Data(this._student, this.context);
 
-  Data(this._student, this.context, this.onEdit);
-
-  void updateData(List<Student> newStudents) {
+  void updateData(List<Students> newStudents) {
     _student = newStudents;
     notifyListeners();
   }
@@ -197,7 +142,12 @@ class Data extends DataTableSource {
       DataCell(
         TextButton(
           onPressed: () {
-            onEdit(context, _student[index]);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Edit(student: _student[index]),
+              ),
+            );
           },
           child: Icon(Icons.edit),
         ),

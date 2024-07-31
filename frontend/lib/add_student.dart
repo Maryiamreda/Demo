@@ -81,6 +81,7 @@ class _addStudentState extends State<addStudent> {
   final TextEditingController skillController = TextEditingController();
 
   final List<String> skills = [];
+
   final List<address> addresses = [];
 
   final List<TextEditingController> countryControllers = [
