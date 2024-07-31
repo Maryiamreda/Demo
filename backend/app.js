@@ -112,72 +112,82 @@ app.post('/students/Create', async (req, res) => {
     }
 });
 
-// app.post('/students/Create', async (req, res) => {
-
-//     const { FirstName, LastName, Skills, Adress: addressData } = req.body;
-
-//     try {
-//         // Create new addresses if provided
-//         if (addressData) {
-//             const addressIds = await Promise.all(addressData?.map(async (address) => {
-//                 const newAddress = new Address(address);
-//                 const savedAddress = await newAddress.save();
-//                 return savedAddress._id;
-//             }));
-//         }
-
-
-//         // Create and save the student
-//         const student = new Students({
-//             FirstName,
-//             LastName,
-//             Adress: addressIds,
-//             Skills,
-//         });
-
-//         const savedStudent = await student.save();
-
-//         // Update the skills collection
-//         if (savedStudent.Skills.length > 0) {
-//             await skills.updateMany(
-//                 { '_id': { $in: savedStudent.Skills } },
-//                 { $push: { Students: savedStudent._id } }
-//             );
-//         }
-
-//         // Update the addresses collection
-//         if (savedStudent.Adress.length > 0) {
-//             await Address.updateMany(
-//                 { '_id': { $in: savedStudent.Adress } },
-//                 { $push: { Students: savedStudent._id } }
-//             );
-//         }
-
-//         res.json(savedStudent);
-//         console.log(req.body);
-
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).send('Internal Server Error');
-//     }
-// });
 
 
 //EditStudent
 app.put('/students/Edit/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const student = await Students.findByIdAndUpdate(id, req.body)
-        if (!student) {
-            return res.status(404).json({ message: "student not found" })
-        }
-        const updatedstudent = await Students.findById(id)
-        return res.status(200).json(updatedstudent)
+        const { FirstName, LastName, Skills, Adress } = req.body;
 
+        // First, create or update address documents
+        const addressPromises = Adress.map(async (addr) => {
+            if (addr._id) {
+                // If address has an ID, update it
+                const updatedAddress = await Address.findByIdAndUpdate(
+                    addr._id,
+                    {
+                        Country: addr.Country,
+                        City: addr.City,
+                        Street1: addr.Street1,
+                        Street2: addr.Street2,
+                        $addToSet: { Students: id }
+                    },
+                    { new: true }
+                );
+                return updatedAddress._id;
+            } else {
+                // If no ID, create a new address
+                const newAddress = new Address({
+                    Country: addr.Country,
+                    City: addr.City,
+                    Street1: addr.Street1,
+                    Street2: addr.Street2,
+                    Students: [id]
+                });
+                const savedAddress = await newAddress.save();
+                return savedAddress._id;
+            }
+        });
+
+        const addressIds = await Promise.all(addressPromises);
+
+        // Now update the student with the new/updated address IDs
+        const updatedStudent = await Students.findByIdAndUpdate(id, {
+            FirstName,
+            LastName,
+            Skills,
+            Adress: addressIds
+        }, { new: true });
+
+        if (!updatedStudent) {
+            return res.status(404).json({ message: "Student not found" });
+        }
+
+        // Populate the addresses for the response
+        await updatedStudent.populate('Adress');
+
+        return res.status(200).json(updatedStudent);
     } catch (error) {
-        return res.status(500).json({ message: error.message })
-    };
-})
+        console.error('Error updating student:', error);
+        return res.status(500).json({ message: error.message });
+    }
+});
+
+// app.put('/students/Edit/:id', async (req, res) => {
+//     try {
+//         const { id } = req.params;
+//         const student = await Students.findByIdAndUpdate(id, req.body)
+//         if (!student) {
+//             return res.status(404).json({ message: "student not found" })
+//         }
+//         const updatedstudent = await Students.findById(id)
+//         return res.status(200).json(updatedstudent)
+
+//     } catch (error) {
+//         return res.status(500).json({ message: error.message })
+//     };
+// })
 //DeleteStudent
 app.delete('/students/Delete/:id', async (req, res) => {
     try {
