@@ -18,7 +18,7 @@ class _EditState extends State<Edit> {
 
   List<TextEditingController> skillControllers = [];
   List<Map<String, TextEditingController>> addresses = [];
-
+  List<String> addressIds = [];
   @override
   void initState() {
     super.initState();
@@ -66,6 +66,50 @@ class _EditState extends State<Edit> {
       });
     } else {
       throw Exception('Failed to load students');
+    }
+  }
+
+  Future<void> updateStudent() async {
+    try {
+      Map<String, dynamic> updateData = {
+        'FirstName': firstNameController.text,
+        'LastName': lastNameController.text,
+        'Skills':
+            skillControllers.map((controller) => controller.text).toList(),
+        'Adress': addresses
+            .map((addr) => {
+                  '_id': addr['_id']?.text, // Include _id if it exists
+                  'Country': addr['Country']!.text,
+                  'City': addr['City']!.text,
+                  'Street1': addr['Street1']!.text,
+                  'Street2': addr['Street2']!.text,
+                })
+            .toList(),
+      };
+
+      final response = await http.put(
+        Uri.parse('http://localhost:3000/students/Edit/${widget.student.id}'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(updateData),
+      );
+
+      if (response.statusCode == 200) {
+        final updatedStudent = jsonDecode(response.body);
+        print('Updated student: $updatedStudent');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Student updated successfully')),
+        );
+        Navigator.pop(context);
+      } else {
+        throw Exception('Failed to update student: ${response.body}');
+      }
+    } catch (e) {
+      print('Error updating student: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update student: $e')),
+      );
     }
   }
 
@@ -170,6 +214,7 @@ class _EditState extends State<Edit> {
               ElevatedButton(
                 onPressed: () {
                   // Add save logic here
+                  updateStudent();
                 },
                 child: Text('Save'),
               ),
@@ -179,18 +224,5 @@ class _EditState extends State<Edit> {
         ),
       ),
     );
-
-    @override
-    void dispose() {
-      firstNameController.dispose();
-      lastNameController.dispose();
-      for (var skill in skillControllers) {
-        skill.dispose();
-      }
-      for (var address in addresses) {
-        address.values.forEach((controller) => controller.dispose());
-      }
-      super.dispose();
-    }
   }
 }

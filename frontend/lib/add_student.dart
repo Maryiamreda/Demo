@@ -296,6 +296,10 @@ class _addStudentState extends State<addStudent> {
               ElevatedButton(
                 onPressed: () {
                   create();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => dataTable()),
+                  );
                 },
                 child: Text('Create'),
               ),
