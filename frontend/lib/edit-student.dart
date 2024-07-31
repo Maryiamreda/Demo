@@ -19,17 +19,6 @@ class _EditState extends State<Edit> {
   List<TextEditingController> skillControllers = [];
   List<Map<String, TextEditingController>> addresses = [];
 
-  final List<TextEditingController> countryControllers = [
-    TextEditingController()
-  ];
-  final List<TextEditingController> cityControllers = [TextEditingController()];
-  final List<TextEditingController> street1Controllers = [
-    TextEditingController()
-  ];
-  final List<TextEditingController> street2Controllers = [
-    TextEditingController()
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -55,10 +44,10 @@ class _EditState extends State<Edit> {
           addresses =
               json['Adress'].map<Map<String, TextEditingController>>((address) {
             return {
-              'country': TextEditingController(text: address['country'] ?? ''),
-              'city': TextEditingController(text: address['city'] ?? ''),
-              'street1': TextEditingController(text: address['street1'] ?? ''),
-              'street2': TextEditingController(text: address['street2'] ?? ''),
+              'Country': TextEditingController(text: address['Country'] ?? ''),
+              'City': TextEditingController(text: address['City'] ?? ''),
+              'Street1': TextEditingController(text: address['Street1'] ?? ''),
+              'Street2': TextEditingController(text: address['Street2'] ?? ''),
             };
           }).toList();
         }
@@ -68,7 +57,7 @@ class _EditState extends State<Edit> {
           if (json['Skills'] is List) {
             skillControllers = json['Skills']
                 .map<TextEditingController>(
-                    (skill) => TextEditingController(text: skill.toString()))
+                    (skill) => TextEditingController(text: skill['_id']))
                 .toList();
           } else if (json['Skills'] is String) {
             skillControllers = [TextEditingController(text: json['Skills'])];
@@ -92,14 +81,14 @@ class _EditState extends State<Edit> {
                 children: [
                   Expanded(
                     child: TextField(
-                      controller: countryControllers[i],
+                      controller: addresses[i]['Country'],
                       decoration: InputDecoration(labelText: 'Country'),
                     ),
                   ),
                   SizedBox(width: 10),
                   Expanded(
                     child: TextField(
-                      controller: cityControllers[i],
+                      controller: addresses[i]['City'],
                       decoration: InputDecoration(labelText: 'City'),
                     ),
                   ),
@@ -110,20 +99,19 @@ class _EditState extends State<Edit> {
                 children: [
                   Expanded(
                     child: TextField(
-                      controller: street1Controllers[i],
+                      controller: addresses[i]['Street1'],
                       decoration: InputDecoration(labelText: 'Street 1'),
                     ),
                   ),
                   SizedBox(width: 10),
                   Expanded(
                     child: TextField(
-                      controller: street2Controllers[i],
+                      controller: addresses[i]['Street2'],
                       decoration: InputDecoration(labelText: 'Street 2'),
                     ),
                   ),
                 ],
               ),
-              // if (i < countryControllers.length - 1) SizedBox(height: 20),
             ],
           ),
       ],
