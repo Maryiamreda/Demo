@@ -30,6 +30,7 @@ class dataTable extends StatefulWidget {
 class _dataTableState extends State<dataTable> {
   late Data data;
   List<Students> _students = [];
+
   int _sortColumnIndex = 0;
   bool _sortAscending = true;
 
@@ -76,39 +77,66 @@ class _dataTableState extends State<dataTable> {
     });
   }
 
+  void _filterStudents(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        data.updateData(_students);
+      } else {
+        List<Students> filteredStudents = _students
+            .where((student) =>
+                student.FirstName.toLowerCase().contains(query.toLowerCase()) ||
+                student.LastName.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+        data.updateData(filteredStudents);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Student'),
+        title: const Text('Students'),
         backgroundColor: Colors.purple[200],
       ),
       body: Column(
         children: [
-          PaginatedDataTable(
-            rowsPerPage: 5,
-            columns: [
-              DataColumn(
-                label: Text(
-                  'First Name',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                onSort: (columnIndex, ascending) {
-                  onsortColum(columnIndex, ascending);
-                },
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              decoration: InputDecoration(
+                labelText: 'Search ',
+                prefixIcon: Icon(Icons.search),
               ),
-              DataColumn(
-                label: Text(
-                  'Last Name',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+              onChanged: _filterStudents,
+            ),
+          ),
+          Expanded(
+            child: PaginatedDataTable(
+              rowsPerPage: 5,
+              columns: [
+                DataColumn(
+                  label: Text(
+                    'First Name',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  onSort: (columnIndex, ascending) {
+                    onsortColum(columnIndex, ascending);
+                  },
                 ),
-                onSort: (columnIndex, ascending) {
-                  onsortColum(columnIndex, ascending);
-                },
-              ),
-              DataColumn(label: Text(' ')),
-            ],
-            source: data,
+                DataColumn(
+                  label: Text(
+                    'Last Name',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  onSort: (columnIndex, ascending) {
+                    onsortColum(columnIndex, ascending);
+                  },
+                ),
+                DataColumn(label: Text(' ')),
+              ],
+              source: data,
+            ),
           ),
           FilledButton(
               onPressed: () {
